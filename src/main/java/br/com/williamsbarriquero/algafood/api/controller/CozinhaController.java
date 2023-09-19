@@ -2,6 +2,7 @@ package br.com.williamsbarriquero.algafood.api.controller;
 
 import br.com.williamsbarriquero.algafood.domain.model.Cozinha;
 import br.com.williamsbarriquero.algafood.domain.repository.CozinhaRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,5 +37,21 @@ public class CozinhaController {
     @ResponseStatus(HttpStatus.CREATED)
     public Cozinha adicionar(@RequestBody Cozinha cozinha) {
         return cozinhaRepository.salvar(cozinha);
+    }
+
+    @PutMapping("/{cozinhaId}")
+    public ResponseEntity<Cozinha> atualizar(@PathVariable Long cozinhaId, @RequestBody Cozinha cozinha) {
+
+        Cozinha cozinhaAtual = cozinhaRepository.buscar(cozinhaId);
+
+        if (cozinhaAtual != null) {
+            BeanUtils.copyProperties(cozinha, cozinhaAtual, "id");
+
+            cozinhaAtual = cozinhaRepository.salvar(cozinhaAtual);
+
+            return ResponseEntity.ok(cozinhaAtual);
+        }
+
+        return ResponseEntity.notFound().build();
     }
 }
