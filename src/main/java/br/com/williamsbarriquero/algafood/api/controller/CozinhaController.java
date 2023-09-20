@@ -2,6 +2,7 @@ package br.com.williamsbarriquero.algafood.api.controller;
 
 import br.com.williamsbarriquero.algafood.domain.model.Cozinha;
 import br.com.williamsbarriquero.algafood.domain.repository.CozinhaRepository;
+import br.com.williamsbarriquero.algafood.domain.service.CadastroCozinhaService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -15,9 +16,11 @@ import java.util.List;
 public class CozinhaController {
 
     private final CozinhaRepository cozinhaRepository;
+    private final CadastroCozinhaService cadastroCozinha;
 
-    public CozinhaController(CozinhaRepository cozinhaRepository) {
+    public CozinhaController(CozinhaRepository cozinhaRepository, CadastroCozinhaService cadastroCozinha) {
         this.cozinhaRepository = cozinhaRepository;
+        this.cadastroCozinha = cadastroCozinha;
     }
 
     @GetMapping
@@ -37,7 +40,7 @@ public class CozinhaController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Cozinha adicionar(@RequestBody Cozinha cozinha) {
-        return cozinhaRepository.salvar(cozinha);
+        return cadastroCozinha.salvar(cozinha);
     }
 
     @PutMapping("/{cozinhaId}")
