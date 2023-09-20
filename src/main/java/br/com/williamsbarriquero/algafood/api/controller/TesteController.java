@@ -60,7 +60,7 @@ public class TesteController {
         return restauranteRepository.findTop2ByNomeContaining(nome);
     }
 
-    @GetMapping("/restaurantes/por-taxa-frete")
+    @GetMapping("/restaurantes/por-nome-e-taxa-frete")
     public List<Restaurante> restaurantesPorNomeTaxaFrete(String nome, BigDecimal taxaInicial, BigDecimal taxaFinal) {
         return restauranteRepository.find(nome, taxaInicial, taxaFinal);
     }
