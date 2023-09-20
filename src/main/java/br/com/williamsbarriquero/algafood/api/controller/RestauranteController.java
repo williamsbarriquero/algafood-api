@@ -1,12 +1,12 @@
 package br.com.williamsbarriquero.algafood.api.controller;
 
+import br.com.williamsbarriquero.algafood.domain.exception.EntidadeNaoEncontradaException;
 import br.com.williamsbarriquero.algafood.domain.model.Restaurante;
 import br.com.williamsbarriquero.algafood.domain.repository.RestauranteRepository;
+import br.com.williamsbarriquero.algafood.domain.service.CadastroRestauranteService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,14 +15,26 @@ import java.util.List;
 public class RestauranteController {
 
     private final RestauranteRepository restauranteRepository;
+    private final CadastroRestauranteService cadastroRestauranteService;
 
-    public RestauranteController(RestauranteRepository restauranteRepository) {
+    public RestauranteController(RestauranteRepository restauranteRepository, CadastroRestauranteService cadastroRestauranteService) {
         this.restauranteRepository = restauranteRepository;
+        this.cadastroRestauranteService = cadastroRestauranteService;
     }
 
     @GetMapping
     public List<Restaurante> listar() {
         return restauranteRepository.listar();
+    }
+
+    @PostMapping
+    public ResponseEntity<Restaurante> adicionar(@RequestBody Restaurante restaurante) {
+        try {
+            restaurante = cadastroRestauranteService.salvar(restaurante);
+            return ResponseEntity.status(HttpStatus.CREATED).body(restaurante);
+        } catch (EntidadeNaoEncontradaException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/{restauranteId}")
