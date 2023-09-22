@@ -3,13 +3,14 @@ package br.com.williamsbarriquero.algafood.infrastructure.repository;
 import br.com.williamsbarriquero.algafood.domain.model.Restaurante;
 import br.com.williamsbarriquero.algafood.domain.repository.RestauranteRepositoryQueries;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 
 @Repository
@@ -20,26 +21,18 @@ public class RestauranteRepositoryImpl implements RestauranteRepositoryQueries {
 
     @Override
     public List<Restaurante> find(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal) {
-        var jpql = new StringBuilder().append("from Restaurante where 0 = 0 ");
 
-        var parametros = new HashMap<String, Object>();
+        CriteriaBuilder builder = manager.getCriteriaBuilder();
 
-        if (StringUtils.hasLength(nome)) {
-            jpql.append("and nome like :nome ");
-            parametros.put("nome", "%" + nome + "%");
-        }
-        if (taxaFreteInicial != null) {
-            jpql.append("and taxaFrete >= :taxaInicial ");
-            parametros.put("taxaInicial", taxaFreteInicial);
-        }
-        if (taxaFreteFinal != null) {
-            jpql.append("and taxaFrete >= :taxaFinal ");
-            parametros.put("taxaFinal", taxaFreteFinal);
-        }
+        CriteriaQuery<Restaurante> criteria = builder.createQuery(Restaurante.class);
+        Root<Restaurante> root = criteria.from(Restaurante.class);
 
-        TypedQuery<Restaurante> query = manager.createQuery(jpql.toString(), Restaurante.class);
-        parametros.forEach(query::setParameter);
+        Predicate nomePredicate = builder.like(root.get("nome"), "%" + nome + "%");
+        Predicate taxaInicialPredicate = builder.greaterThanOrEqualTo(root.get("taxaFrete"), taxaFreteInicial);
+        Predicate taxaFinalPredicate = builder.lessThanOrEqualTo(root.get("taxaFrete"), taxaFreteFinal);
 
-        return query.getResultList();
+        criteria.where(nomePredicate, taxaInicialPredicate, taxaFinalPredicate);
+
+        return manager.createQuery(criteria).getResultList();
     }
 }
