@@ -7,10 +7,9 @@ spring:
       maximum-pool-size: 5
       minimum-idle: 3
       idle-timeout: 10000
+  flyway:
+    locations: classpath:db/migration,classpath:db/testdata
   jpa:
-#    generate-ddl: true
-#    hibernate:
-#      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
