@@ -3,31 +3,36 @@ package br.com.williamsbarriquero.algafood.domain.service;
 import br.com.williamsbarriquero.algafood.domain.exception.EntidadeNaoEncontradaException;
 import br.com.williamsbarriquero.algafood.domain.model.Cozinha;
 import br.com.williamsbarriquero.algafood.domain.model.Restaurante;
-import br.com.williamsbarriquero.algafood.domain.repository.CozinhaRepository;
 import br.com.williamsbarriquero.algafood.domain.repository.RestauranteRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CadastroRestauranteService {
 
-    private final CozinhaRepository cozinhaRepository;
+    private static final String MSG_RESTAURANTE_NAO_ENCONTRADO
+            = "Não existe um cadastro de restaurante com código %d";
+
+    private final CadastroCozinhaService cadastroCozinha;
     private final RestauranteRepository restauranteRepository;
 
-    public CadastroRestauranteService(CozinhaRepository cozinhaRepository, RestauranteRepository restauranteRepository) {
-        this.cozinhaRepository = cozinhaRepository;
+    public CadastroRestauranteService(CadastroCozinhaService cadastroCozinha, RestauranteRepository restauranteRepository) {
+        this.cadastroCozinha = cadastroCozinha;
         this.restauranteRepository = restauranteRepository;
     }
 
     public Restaurante salvar(Restaurante restaurante) {
         Long cozinhaId = restaurante.getCozinha().getId();
 
-        Cozinha cozinha = cozinhaRepository.findById(cozinhaId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException(
-                        String.format("Não existe cadastro de cozinha com o código %d", cozinhaId)
-                ));
+        Cozinha cozinha = cadastroCozinha.buscarOuFalhar(cozinhaId);
 
         restaurante.setCozinha(cozinha);
 
         return restauranteRepository.save(restaurante);
+    }
+
+    public Restaurante buscarOuFalhar(Long restauranteId) {
+        return restauranteRepository.findById(restauranteId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(
+                        String.format(MSG_RESTAURANTE_NAO_ENCONTRADO, restauranteId)));
     }
 }

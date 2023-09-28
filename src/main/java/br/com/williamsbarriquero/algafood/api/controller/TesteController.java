@@ -13,8 +13,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static br.com.williamsbarriquero.algafood.infrastructure.repository.spec.RestauranteSpecs.*;
-
 @RestController
 @RequestMapping("/teste")
 public class TesteController {
