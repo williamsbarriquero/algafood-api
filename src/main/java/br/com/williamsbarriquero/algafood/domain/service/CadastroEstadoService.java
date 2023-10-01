@@ -1,7 +1,7 @@
 package br.com.williamsbarriquero.algafood.domain.service;
 
 import br.com.williamsbarriquero.algafood.domain.exception.EntidadeEmUsoException;
-import br.com.williamsbarriquero.algafood.domain.exception.EntidadeNaoEncontradaException;
+import br.com.williamsbarriquero.algafood.domain.exception.EstadoNaoEncontradoException;
 import br.com.williamsbarriquero.algafood.domain.model.Estado;
 import br.com.williamsbarriquero.algafood.domain.repository.EstadoRepository;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,9 +13,6 @@ public class CadastroEstadoService {
 
     private static final String MSG_ESTADO_EM_USO =
             "Estado de código %d não pode ser removido, pois está em uso";
-
-    private static final String MSG_ESTADO_NAO_ENCONTRADO =
-            "Não existe um cadastro de estado com código %d";
 
     private final EstadoRepository estadoRepository;
 
@@ -31,8 +28,7 @@ public class CadastroEstadoService {
         try {
             estadoRepository.deleteById(estadoId);
         } catch (EmptyResultDataAccessException e) {
-            throw new EntidadeNaoEncontradaException(
-                    String.format(MSG_ESTADO_NAO_ENCONTRADO, estadoId));
+            throw new EstadoNaoEncontradoException(estadoId);
         } catch (DataIntegrityViolationException e) {
             throw new EntidadeEmUsoException(
                     String.format(MSG_ESTADO_EM_USO, estadoId));
@@ -41,7 +37,6 @@ public class CadastroEstadoService {
 
     public Estado buscarOuFalhar(Long estadoId) {
         return estadoRepository.findById(estadoId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException(
-                        String.format(MSG_ESTADO_NAO_ENCONTRADO, estadoId)));
+                .orElseThrow(() -> new EstadoNaoEncontradoException(estadoId));
     }
 }

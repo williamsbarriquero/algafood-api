@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.io.Serial;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class EntidadeNaoEncontradaException extends RuntimeException {
+public abstract class EntidadeNaoEncontradaException extends NegocioException {
 
     @Serial
     private static final long serialVersionUID = 3993431480077089969L;
 
-    public EntidadeNaoEncontradaException(String message) {
+    protected EntidadeNaoEncontradaException(String message) {
         super(message);
     }
 }

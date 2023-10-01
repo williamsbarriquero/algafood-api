@@ -1,6 +1,6 @@
 package br.com.williamsbarriquero.algafood.api.controller;
 
-import br.com.williamsbarriquero.algafood.domain.exception.EntidadeNaoEncontradaException;
+import br.com.williamsbarriquero.algafood.domain.exception.CozinhaNaoEncontradaException;
 import br.com.williamsbarriquero.algafood.domain.exception.NegocioException;
 import br.com.williamsbarriquero.algafood.domain.model.Restaurante;
 import br.com.williamsbarriquero.algafood.domain.repository.RestauranteRepository;
@@ -37,7 +37,7 @@ public class RestauranteController {
     public Restaurante adicionar(@RequestBody Restaurante restaurante) {
         try {
             return cadastroRestaurante.salvar(restaurante);
-        } catch (EntidadeNaoEncontradaException e) {
+        } catch (CozinhaNaoEncontradaException e) {
             throw new NegocioException(e.getMessage());
         }
     }
@@ -50,14 +50,14 @@ public class RestauranteController {
     @PutMapping("/{restauranteId}")
     public Restaurante atualizar(@PathVariable Long restauranteId,
                                  @RequestBody Restaurante restaurante) {
-        Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(restauranteId);
-
-        BeanUtils.copyProperties(restaurante, restauranteAtual,
-                "id", "formasPagamento", "endereco", "dataCadastro", "produtos");
 
         try {
+            Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(restauranteId);
+
+            BeanUtils.copyProperties(restaurante, restauranteAtual,
+                    "id", "formasPagamento", "endereco", "dataCadastro", "produtos");
             return cadastroRestaurante.salvar(restauranteAtual);
-        } catch (EntidadeNaoEncontradaException e) {
+        } catch (CozinhaNaoEncontradaException e) {
             throw new NegocioException(e.getMessage());
         }
     }

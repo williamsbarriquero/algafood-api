@@ -1,6 +1,6 @@
 package br.com.williamsbarriquero.algafood.domain.service;
 
-import br.com.williamsbarriquero.algafood.domain.exception.EntidadeNaoEncontradaException;
+import br.com.williamsbarriquero.algafood.domain.exception.RestauranteNaoEncontradoException;
 import br.com.williamsbarriquero.algafood.domain.model.Cozinha;
 import br.com.williamsbarriquero.algafood.domain.model.Restaurante;
 import br.com.williamsbarriquero.algafood.domain.repository.RestauranteRepository;
@@ -32,7 +32,6 @@ public class CadastroRestauranteService {
 
     public Restaurante buscarOuFalhar(Long restauranteId) {
         return restauranteRepository.findById(restauranteId)
-                .orElseThrow(() -> new EntidadeNaoEncontradaException(
-                        String.format(MSG_RESTAURANTE_NAO_ENCONTRADO, restauranteId)));
+                .orElseThrow(() -> new RestauranteNaoEncontradoException(restauranteId));
     }
 }
