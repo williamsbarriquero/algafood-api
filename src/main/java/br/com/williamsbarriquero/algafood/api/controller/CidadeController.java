@@ -1,6 +1,5 @@
 package br.com.williamsbarriquero.algafood.api.controller;
 
-import br.com.williamsbarriquero.algafood.domain.exception.EntidadeNaoEncontradaException;
 import br.com.williamsbarriquero.algafood.domain.exception.EstadoNaoEncontradoException;
 import br.com.williamsbarriquero.algafood.domain.exception.NegocioException;
 import br.com.williamsbarriquero.algafood.domain.model.Cidade;
@@ -64,4 +63,5 @@ public class CidadeController {
     public void remover(@PathVariable Long cidadeId) {
         cadastroCidade.excluir(cidadeId);
     }
+
 }
