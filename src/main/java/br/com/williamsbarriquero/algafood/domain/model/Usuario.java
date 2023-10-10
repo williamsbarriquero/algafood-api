@@ -33,7 +33,7 @@ public class Usuario {
     private LocalDateTime dataCadastro;
 
     @ManyToMany
-    @JoinTable(name = "grupo_usuario", joinColumns = @JoinColumn(name = "usuario_id"),
+    @JoinTable(name = "usuario_grupo", joinColumns = @JoinColumn(name = "usuario_id"),
     inverseJoinColumns = @JoinColumn(name = "grupo_id"))
     private List<Grupo> grupos = new ArrayList<>();
 }
