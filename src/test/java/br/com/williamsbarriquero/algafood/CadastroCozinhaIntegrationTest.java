@@ -1,5 +1,7 @@
 package br.com.williamsbarriquero.algafood;
 
+import br.com.williamsbarriquero.algafood.domain.exception.CozinhaNaoEncontradaException;
+import br.com.williamsbarriquero.algafood.domain.exception.EntidadeEmUsoException;
 import br.com.williamsbarriquero.algafood.domain.model.Cozinha;
 import br.com.williamsbarriquero.algafood.domain.service.CadastroCozinhaService;
 import org.junit.jupiter.api.Test;
@@ -19,15 +21,12 @@ class CadastroCozinhaIntegrationTest {
 
 
     @Test
-    void testarCadastroCozinhaComSucesso() {
-        // cenário
-        Cozinha novaCozinha = new Cozinha();
+    void deveAtribuirId_QuandoCadastrarCozinhaComDadosCorretos() {
+        var novaCozinha = new Cozinha();
         novaCozinha.setNome("Chinesa");
 
-        // ação
         novaCozinha = cadastroCozinha.salvar(novaCozinha);
 
-        // validação
         assertThat(novaCozinha).isNotNull();
         assertThat(novaCozinha.getId()).isNotNull();
     }
@@ -43,5 +42,19 @@ class CadastroCozinhaIntegrationTest {
         assertThat(erroEsperado).isNotNull();
     }
 
+    @Test
+    void deveFalhar_QuandoExcluirCozinhaEmUso() {
+        final var erroEsperado =
+                assertThrows(EntidadeEmUsoException.class, () -> cadastroCozinha.excluir(1L));
 
+        assertThat(erroEsperado).isNotNull();
+    }
+
+    @Test
+    void deveFalhar_QuandoExcluirCozinhaInexistente() {
+        final var erroEsperado =
+                assertThrows(CozinhaNaoEncontradaException.class, () -> cadastroCozinha.excluir(100L));
+
+        assertThat(erroEsperado).isNotNull();
+    }
 }
