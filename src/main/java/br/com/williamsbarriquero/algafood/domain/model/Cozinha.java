@@ -1,6 +1,6 @@
 package br.com.williamsbarriquero.algafood.domain.model;
 
-import br.com.williamsbarriquero.algafood.Groups;
+import br.com.williamsbarriquero.algafood.core.validation.Groups;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

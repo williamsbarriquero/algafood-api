@@ -1,4 +1,4 @@
-package br.com.williamsbarriquero.algafood;
+package br.com.williamsbarriquero.algafood.core.validation;
 
 public interface Groups {
 
