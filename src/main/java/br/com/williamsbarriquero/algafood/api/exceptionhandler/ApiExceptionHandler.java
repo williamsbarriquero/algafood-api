@@ -1,5 +1,6 @@
 package br.com.williamsbarriquero.algafood.api.exceptionhandler;
 
+import br.com.williamsbarriquero.algafood.core.validation.ValidacaoException;
 import br.com.williamsbarriquero.algafood.domain.exception.EntidadeEmUsoException;
 import br.com.williamsbarriquero.algafood.domain.exception.EntidadeNaoEncontradaException;
 import br.com.williamsbarriquero.algafood.domain.exception.NegocioException;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -64,37 +66,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex,
-                                                                  final HttpHeaders headers, final HttpStatus status,
-                                                                  final WebRequest request) {
-
-        final var problemType = ProblemType.DADOS_INVALIDOS;
-        final var detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
-
-        final var bindingResult = ex.getBindingResult();
-
-        final var problemFields = bindingResult.getAllErrors().stream()
-                .map(objectError -> {
-                    final var message = messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
-
-                    var name = objectError.getObjectName();
-
-                    if (objectError instanceof final FieldError fieldError) {
-                        name = fieldError.getField();
-                    }
-
-                    return Problem.Object.builder()
-                            .name(name)
-                            .userMessage(message)
-                            .build();
-                }).toList();
-
-        final var problem = createProblemBuilder(status, problemType, detail)
-                .userMessage(detail)
-                .objects(problemFields)
-                .build();
-
-        return handleExceptionInternal(ex, problem, headers, status, request);
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            final MethodArgumentNotValidException ex,
+            final HttpHeaders headers,
+            final HttpStatus status,
+            final WebRequest request
+    ) {
+        return handleValidationInternal(ex, ex.getBindingResult(), headers, status, request);
     }
 
     @Override
@@ -177,6 +155,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
     }
 
+    @ExceptionHandler({ValidacaoException.class})
+    public ResponseEntity<Object> handleValidacaoException(final ValidacaoException ex, final WebRequest request) {
+        return handleValidationInternal(ex, ex.getBindingResult(), new HttpHeaders(),
+                HttpStatus.BAD_REQUEST, request);
+    }
+
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
                                                              HttpStatus status, WebRequest request) {
@@ -245,6 +229,42 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
+                .build();
+
+        return handleExceptionInternal(ex, problem, headers, status, request);
+    }
+
+    private ResponseEntity<Object> handleValidationInternal(
+            final Exception ex,
+            final BindingResult bindingResult,
+            final HttpHeaders headers,
+            final HttpStatus status,
+            final WebRequest request
+    ) {
+
+        final var problemType = ProblemType.DADOS_INVALIDOS;
+        String detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
+
+        final var problemObjects = bindingResult.getAllErrors().stream()
+                .map(objectError -> {
+                    final var message = messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
+
+                    String name = objectError.getObjectName();
+
+                    if (objectError instanceof final FieldError fieldError) {
+                        name = fieldError.getField();
+                    }
+
+                    return Problem.Object.builder()
+                            .name(name)
+                            .userMessage(message)
+                            .build();
+                })
+                .toList();
+
+        Problem problem = createProblemBuilder(status, problemType, detail)
+                .userMessage(detail)
+                .objects(problemObjects)
                 .build();
 
         return handleExceptionInternal(ex, problem, headers, status, request);
