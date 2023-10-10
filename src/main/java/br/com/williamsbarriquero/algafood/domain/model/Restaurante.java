@@ -1,6 +1,7 @@
 package br.com.williamsbarriquero.algafood.domain.model;
 
 import br.com.williamsbarriquero.algafood.core.validation.Groups;
+import br.com.williamsbarriquero.algafood.core.validation.Multiplo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +34,8 @@ public class Restaurante {
     private String nome;
 
     @NotNull
-    @PositiveOrZero(message = "{TaxaFrete.invalida}")
+    @PositiveOrZero
+    @Multiplo()
     @Column(name = "taxa_frete", nullable = false)
     private BigDecimal taxaFrete;
 
