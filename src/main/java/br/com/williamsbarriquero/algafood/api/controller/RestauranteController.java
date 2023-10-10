@@ -1,5 +1,6 @@
 package br.com.williamsbarriquero.algafood.api.controller;
 
+import br.com.williamsbarriquero.algafood.core.validation.ValidacaoException;
 import br.com.williamsbarriquero.algafood.domain.exception.CozinhaNaoEncontradaException;
 import br.com.williamsbarriquero.algafood.domain.exception.NegocioException;
 import br.com.williamsbarriquero.algafood.domain.model.Restaurante;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.SmartValidator;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,10 +30,16 @@ public class RestauranteController {
 
     private final RestauranteRepository restauranteRepository;
     private final CadastroRestauranteService cadastroRestaurante;
+    private final SmartValidator validator;
 
-    public RestauranteController(RestauranteRepository restauranteRepository, CadastroRestauranteService cadastroRestaurante) {
+    public RestauranteController(
+            final RestauranteRepository restauranteRepository,
+            final CadastroRestauranteService cadastroRestaurante,
+            final SmartValidator validator
+    ) {
         this.restauranteRepository = restauranteRepository;
         this.cadastroRestaurante = cadastroRestaurante;
+        this.validator = validator;
     }
 
     @GetMapping
@@ -40,7 +49,7 @@ public class RestauranteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Restaurante adicionar(@RequestBody @Valid Restaurante restaurante) {
+    public Restaurante adicionar(@RequestBody @Valid final Restaurante restaurante) {
         try {
             return cadastroRestaurante.salvar(restaurante);
         } catch (CozinhaNaoEncontradaException e) {
@@ -49,13 +58,13 @@ public class RestauranteController {
     }
 
     @GetMapping("/{restauranteId}")
-    public Restaurante buscar(@PathVariable Long restauranteId) {
+    public Restaurante buscar(@PathVariable final Long restauranteId) {
         return cadastroRestaurante.buscarOuFalhar(restauranteId);
     }
 
     @PutMapping("/{restauranteId}")
-    public Restaurante atualizar(@PathVariable Long restauranteId,
-                                 @RequestBody @Valid Restaurante restaurante) {
+    public Restaurante atualizar(@PathVariable final Long restauranteId,
+                                 @RequestBody @Valid final Restaurante restaurante) {
 
         try {
             Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(restauranteId);
@@ -69,14 +78,24 @@ public class RestauranteController {
     }
 
     @PatchMapping("/{restauranteId}")
-    public Restaurante atualizarParcial(@PathVariable Long restauranteId,
-                                        @RequestBody Map<String, Object> campos,
-                                        HttpServletRequest request) {
+    public Restaurante atualizarParcial(@PathVariable final Long restauranteId,
+                                        @RequestBody final Map<String, Object> campos,
+                                        final HttpServletRequest request) {
         Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(restauranteId);
 
         merge(campos, restauranteAtual, request);
+        validate(restauranteAtual, "restaurante");
 
         return atualizar(restauranteId, restauranteAtual);
+    }
+
+    private void validate(final Restaurante restaurante, final String objectName) {
+        final var bindingResult = new BeanPropertyBindingResult(restaurante, objectName);
+        validator.validate(restaurante, bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            throw new ValidacaoException(bindingResult);
+        }
     }
 
     private void merge(Map<String, Object> dadosOrigem, Restaurante restauranteDestino, HttpServletRequest request) {
