@@ -7,6 +7,7 @@ import br.com.williamsbarriquero.algafood.domain.repository.EstadoRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CadastroEstadoService {
@@ -16,15 +17,17 @@ public class CadastroEstadoService {
 
     private final EstadoRepository estadoRepository;
 
-    public CadastroEstadoService(EstadoRepository estadoRepository) {
+    public CadastroEstadoService(final EstadoRepository estadoRepository) {
         this.estadoRepository = estadoRepository;
     }
 
-    public Estado salvar(Estado estado) {
+    @Transactional
+    public Estado salvar(final Estado estado) {
         return estadoRepository.save(estado);
     }
 
-    public void excluir(Long estadoId) {
+    @Transactional
+    public void excluir(final Long estadoId) {
         try {
             estadoRepository.deleteById(estadoId);
         } catch (EmptyResultDataAccessException e) {
@@ -35,7 +38,7 @@ public class CadastroEstadoService {
         }
     }
 
-    public Estado buscarOuFalhar(Long estadoId) {
+    public Estado buscarOuFalhar(final Long estadoId) {
         return estadoRepository.findById(estadoId)
                 .orElseThrow(() -> new EstadoNaoEncontradoException(estadoId));
     }

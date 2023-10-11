@@ -3,11 +3,11 @@ package br.com.williamsbarriquero.algafood.domain.service;
 import br.com.williamsbarriquero.algafood.domain.exception.CidadeNaoEncontradaException;
 import br.com.williamsbarriquero.algafood.domain.exception.EntidadeEmUsoException;
 import br.com.williamsbarriquero.algafood.domain.model.Cidade;
-import br.com.williamsbarriquero.algafood.domain.model.Estado;
 import br.com.williamsbarriquero.algafood.domain.repository.CidadeRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CadastroCidadeService {
@@ -18,22 +18,24 @@ public class CadastroCidadeService {
     private final CidadeRepository cidadeRepository;
     private final CadastroEstadoService cadastroEstado;
 
-    public CadastroCidadeService(CidadeRepository cidadeRepository, CadastroEstadoService cadastroEstado) {
+    public CadastroCidadeService(final CidadeRepository cidadeRepository, final CadastroEstadoService cadastroEstado) {
         this.cidadeRepository = cidadeRepository;
         this.cadastroEstado = cadastroEstado;
     }
 
-    public Cidade salvar(Cidade cidade) {
-        Long estadoId = cidade.getEstado().getId();
+    @Transactional
+    public Cidade salvar(final Cidade cidade) {
+        final var estadoId = cidade.getEstado().getId();
 
-        Estado estado = cadastroEstado.buscarOuFalhar(estadoId);
+        final var estado = cadastroEstado.buscarOuFalhar(estadoId);
 
         cidade.setEstado(estado);
 
         return cidadeRepository.save(cidade);
     }
 
-    public void excluir(Long cidadeId) {
+    @Transactional
+    public void excluir(final Long cidadeId) {
         try {
             cidadeRepository.deleteById(cidadeId);
 
@@ -46,7 +48,7 @@ public class CadastroCidadeService {
         }
     }
 
-    public Cidade buscarOuFalhar(Long cidadeId) {
+    public Cidade buscarOuFalhar(final Long cidadeId) {
         return cidadeRepository.findById(cidadeId)
                 .orElseThrow(() -> new CidadeNaoEncontradaException(cidadeId));
     }

@@ -7,6 +7,7 @@ import br.com.williamsbarriquero.algafood.domain.repository.CozinhaRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CadastroCozinhaService {
@@ -16,15 +17,17 @@ public class CadastroCozinhaService {
 
     private final CozinhaRepository cozinhaRepository;
 
-    public CadastroCozinhaService(CozinhaRepository cozinhaRepository) {
+    public CadastroCozinhaService(final CozinhaRepository cozinhaRepository) {
         this.cozinhaRepository = cozinhaRepository;
     }
 
-    public Cozinha salvar(Cozinha cozinha) {
+    @Transactional
+    public Cozinha salvar(final Cozinha cozinha) {
         return cozinhaRepository.save(cozinha);
     }
 
-    public void excluir(Long cozinhaId) {
+    @Transactional
+    public void excluir(final Long cozinhaId) {
         try {
             cozinhaRepository.deleteById(cozinhaId);
 
@@ -37,7 +40,7 @@ public class CadastroCozinhaService {
         }
     }
 
-    public Cozinha buscarOuFalhar(Long cozinhaId) {
+    public Cozinha buscarOuFalhar(final Long cozinhaId) {
         return cozinhaRepository.findById(cozinhaId)
                 .orElseThrow(() -> new CozinhaNaoEncontradaException(cozinhaId));
     }
