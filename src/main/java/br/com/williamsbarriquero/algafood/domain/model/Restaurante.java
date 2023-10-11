@@ -1,8 +1,9 @@
 package br.com.williamsbarriquero.algafood.domain.model;
 
 import br.com.williamsbarriquero.algafood.core.validation.Groups;
-import br.com.williamsbarriquero.algafood.core.validation.ValorZeroIncluiDescricao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -52,6 +53,7 @@ public class Restaurante {
     @Column(nullable = false, columnDefinition = "datetime")
     private LocalDateTime dataAtualizacao;
 
+    @JsonIgnoreProperties(value = "nome", allowGetters = true)
     @Valid
     @ConvertGroup(to = Groups.CozinhaId.class)
     @NotNull
