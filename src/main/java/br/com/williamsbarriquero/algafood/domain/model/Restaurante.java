@@ -1,7 +1,6 @@
 package br.com.williamsbarriquero.algafood.domain.model;
 
 import br.com.williamsbarriquero.algafood.core.validation.Groups;
-import br.com.williamsbarriquero.algafood.core.validation.Multiplo;
 import br.com.williamsbarriquero.algafood.core.validation.ValorZeroIncluiDescricao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -21,9 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
-@ValorZeroIncluiDescricao(valorField = "taxaFrete",
-        descricaoField = "nome", descricaoObrigatoria = "Frete Grátis")
 @Getter
 @Setter
 @Entity
@@ -39,7 +35,6 @@ public class Restaurante {
 
     @NotNull
     @PositiveOrZero
-    @Multiplo(numero = 5)
     @Column(name = "taxa_frete", nullable = false)
     private BigDecimal taxaFrete;
 
