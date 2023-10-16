@@ -1,13 +1,11 @@
 package br.com.williamsbarriquero.algafood.domain.model;
 
-import br.com.williamsbarriquero.algafood.core.validation.Groups;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +15,6 @@ import java.util.Objects;
 @Entity
 public class Cozinha {
 
-    @NotNull(groups = Groups.CozinhaId.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
