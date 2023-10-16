@@ -9,7 +9,6 @@ import br.com.williamsbarriquero.algafood.domain.exception.NegocioException;
 import br.com.williamsbarriquero.algafood.domain.model.Restaurante;
 import br.com.williamsbarriquero.algafood.domain.repository.RestauranteRepository;
 import br.com.williamsbarriquero.algafood.domain.service.CadastroRestauranteService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,13 +61,11 @@ public class RestauranteController {
     @PutMapping("/{restauranteId}")
     public RestauranteModel atualizar(@PathVariable final Long restauranteId,
                                       @RequestBody @Valid final RestauranteInput restauranteInput) {
-
         try {
-            final var restaurante = restauranteInputDisassembler.toDomainObject(restauranteInput);
-            Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(restauranteId);
+            final var restauranteAtual = cadastroRestaurante.buscarOuFalhar(restauranteId);
 
-            BeanUtils.copyProperties(restaurante, restauranteAtual,
-                    "id", "formasPagamento", "endereco", "dataCadastro", "produtos");
+            restauranteInputDisassembler.copyToDomainObject(restauranteInput, restauranteAtual);
+
             return restauranteModelAssembler.toModel(cadastroRestaurante.salvar(restauranteAtual));
         } catch (CozinhaNaoEncontradaException e) {
             throw new NegocioException(e.getMessage());
